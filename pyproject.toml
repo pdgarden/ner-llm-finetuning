@@ -1,0 +1,37 @@
+[project]
+name = "nba-ner-llm-finetuning"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ipykernel>=7.1.0",
+    "jupyter>=1.1.1",
+    "loguru>=0.7.3",
+    "matplotlib>=3.10.7",
+    "openai>=2.9.0",
+    "pandas>=2.3.3",
+    "plotly>=6.5.0",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.12.0",
+    "requests>=2.32.5",
+    "seaborn>=0.13.2",
+    "unsloth>=2025.12.5",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.8",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+preview = true
+extend-select = [
+    'E', 'F', 'W', 'C90', 'A', 'ANN', 'S', 'B', 'PT', 'Q', 'RSE', 'SIM', 'ARG', 'PTH', 'PD',
+    'TRY', 'FLY', 'NPY', 'PLC', 'PLE', 'PLW', 'I',
+    ]
+ignore = ['S608', 'ANN401', "S311"]

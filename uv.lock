@@ -1799,7 +1799,7 @@ wheels = [
 [[package]]
 name = "nba-ner-llm-finetuning"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "ipykernel" },
     { name = "jupyter" },

@@ -62,53 +62,54 @@ def pick_random_entities(
 def main(settings: SyntheticSentenceGenerationSettings) -> None:
     synthetic_samples: list[SyntheticSample] = []
 
-    for category, prompt_template in prompts_synthetic_data_generation.items():
-        for language in settings.languages:
-            logger.info(f"Generating synthetic sentences for category: {category} (language: {language})")
+    for llm_model_id in settings.llm_model_ids:
+        for category, prompt_template in prompts_synthetic_data_generation.items():
+            for language in settings.languages:
+                logger.info(f"Generating synthetic sentences for category: {category} (language: {language})")
 
-            # Generate prompt
-            teams, players = pick_random_entities(
-                entities_assets,
-                num_teams=settings.num_samples_team_per_call,
-                num_players=settings.num_samples_player_per_call,
-            )
-            prompt = prompt_template + prompt_entities_example + prompt_general_instructions + prompt_language
-            prompt = prompt.format(
-                team_names_list=", ".join(teams),
-                player_names_list=", ".join(players),
-                language=language,
-            )
-
-            # Call LLM
-            completion = llm_client.beta.chat.completions.parse(
-                model=synthetic_data_generation_settings.llm_model_id,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are a helpful assistant that generates synthetic NBA sentences.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=synthetic_data_generation_settings.temperature,
-                top_p=synthetic_data_generation_settings.top_p,
-                response_format=SyntheticSentences,
-            )
-
-            # Extract sentences
-            sentences = completion.choices[0].message.parsed
-            if not sentences:
-                logger.warning(f"No sentences generated for category: {category}")
-                continue
-
-            for sentence in sentences.sentences:
-                synthetic_samples.append(
-                    SyntheticSample(
-                        sentence=sentence,
-                        llm_model_id=settings.llm_model_id,
-                        category=category,
-                        language=language,
-                    )
+                # Generate prompt
+                teams, players = pick_random_entities(
+                    entities_assets,
+                    num_teams=settings.num_samples_team_per_call,
+                    num_players=settings.num_samples_player_per_call,
                 )
+                prompt = prompt_template + prompt_entities_example + prompt_general_instructions + prompt_language
+                prompt = prompt.format(
+                    team_names_list=", ".join(teams),
+                    player_names_list=", ".join(players),
+                    language=language,
+                )
+
+                # Call LLM
+                completion = llm_client.beta.chat.completions.parse(
+                    model=llm_model_id,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "You are a helpful assistant that generates synthetic NBA sentences.",
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature=synthetic_data_generation_settings.temperature,
+                    top_p=synthetic_data_generation_settings.top_p,
+                    response_format=SyntheticSentences,
+                )
+
+                # Extract sentences
+                sentences = completion.choices[0].message.parsed
+                if not sentences:
+                    logger.warning(f"No sentences generated for category: {category}")
+                    continue
+
+                for sentence in sentences.sentences:
+                    synthetic_samples.append(
+                        SyntheticSample(
+                            sentence=sentence,
+                            llm_model_id=llm_model_id,
+                            category=category,
+                            language=language,
+                        )
+                    )
 
     # Save synthetic samples to a JSON file
     output_samples = SyntheticSamples(samples=synthetic_samples)

@@ -9,7 +9,7 @@ from loguru import logger
 
 from src.constants import SEED, SYNTHETIC_DATA_DIR, SYNTHETIC_DATA_FILE, TRAIN_TEST_SPLIT_RATIO
 from src.prompts_synthetic_data_annotation import ASSISTANT_PROMPT_NER_RETRIEVAL
-from src.settings import SyntheticSentenceGenerationSettings
+from src.settings import SentenceAnnotationGenerationSettings
 from src.type import SyntheticSampleAnnotated, SyntheticSampleAnnotation, SyntheticSamples, SyntheticSamplesAnnotated
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ from src.type import SyntheticSampleAnnotated, SyntheticSampleAnnotation, Synthe
 
 with SYNTHETIC_DATA_FILE.open("r", encoding="utf-8") as f:
     synthetic_samples = SyntheticSamples.model_validate(json.load(f))
-    # synthetic_samples.samples = synthetic_samples.samples[:10]
+    # synthetic_samples.samples = synthetic_samples.samples[:30]  # Uncomment for fast testing
 
 now = datetime.now().strftime("%Y%m%d_%H%M%S")
 OUTPUT_SAMPLES_FILE = SYNTHETIC_DATA_DIR / f"{now}_annotated_synthetic_samples.json"
@@ -26,7 +26,7 @@ OUTPUT_SAMPLES_TRAIN_FILE = SYNTHETIC_DATA_DIR / f"{now}_annotated_synthetic_sam
 OUTPUT_SAMPLES_TEST_FILE = SYNTHETIC_DATA_DIR / f"{now}_annotated_synthetic_samples_test.json"
 
 
-annotated_data_generation_settings = SyntheticSentenceGenerationSettings()
+annotated_data_generation_settings = SentenceAnnotationGenerationSettings()
 
 llm_client = openai.OpenAI(
     base_url=annotated_data_generation_settings.llm_client_url,
@@ -39,11 +39,11 @@ random.seed(SEED)
 # Functions
 
 
-def main(settings: SyntheticSentenceGenerationSettings) -> None:
+def main(settings: SentenceAnnotationGenerationSettings) -> None:
     annotated_samples: list[SyntheticSampleAnnotated] = []
 
     for i, sample in enumerate(synthetic_samples.samples):
-        if i % 20 == 0:
+        if i % 50 == 0:
             logger.info(f"Annotating sample n°{i}")
 
         assistant_prompt = ASSISTANT_PROMPT_NER_RETRIEVAL.format(

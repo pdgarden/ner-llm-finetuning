@@ -18,7 +18,7 @@ from src.type import SampleEvaluated, SamplesEvaluated, SyntheticSampleAnnotatio
 
 with TEST_ANNOTATED_SYNTHETIC_DATA_FILE.open("r", encoding="utf-8") as f:
     test_samples = SyntheticSamplesAnnotated.model_validate(json.load(f))
-    test_samples.samples = test_samples.samples[:30]  # Temporary limit for faster testing
+    # test_samples.samples = test_samples.samples[:30]  # Temporary limit for faster testing
 
 now = datetime.now().strftime("%Y%m%d_%H%M%S")
 now = ""
@@ -40,7 +40,7 @@ def main(settings: SentenceEvaluationSettings) -> None:
     evaluated_samples: list[SampleEvaluated] = []
 
     for i, sample in enumerate(test_samples.samples):
-        if i % 10 == 0:
+        if i % 50 == 0:
             logger.info(f"Evaluating sample n°{i}")
 
         assistant_prompt = ASSISTANT_PROMPT_NER_RETRIEVAL.format(
@@ -48,23 +48,29 @@ def main(settings: SentenceEvaluationSettings) -> None:
         )
 
         start_time = perf_counter()
-        completion = llm_client.beta.chat.completions.parse(
-            model=settings.llm_model_id,
-            messages=[
-                {"role": "assistant", "content": assistant_prompt},
-                {"role": "user", "content": sample.sentence},
-            ],
-            temperature=settings.temperature,
-            response_format=SyntheticSampleAnnotation,
-        )
+        try:
+            completion = llm_client.beta.chat.completions.parse(
+                model=settings.llm_model_id,
+                messages=[
+                    {"role": "assistant", "content": assistant_prompt},
+                    {"role": "user", "content": sample.sentence},
+                ],
+                temperature=settings.temperature,
+                response_format=SyntheticSampleAnnotation,
+                max_tokens=settings.max_tokens,
+            )
+
+            # Extract sentences
+            parsed = completion.choices[0].message.parsed
+
+            if not parsed:
+                raise ValueError  # noqa: TRY301
+
+        except Exception as exc:
+            logger.warning(f"Exception while generating prediction for sample n° {i}: {exc}")
+            parsed = SyntheticSampleAnnotation(team_names=["FAILED_GENERATION"], player_names=["FAILED_GENERATION"])
+
         processing_duration_seconds = perf_counter() - start_time
-
-        # Extract sentences
-        parsed = completion.choices[0].message.parsed
-        if not parsed:
-            logger.warning(f"No parsed generated for sentence: {sample.sentence}")
-            continue
-
         predicted_team_names = parsed.team_names
         predicted_player_names = parsed.player_names
 

@@ -1,5 +1,6 @@
 import hashlib
 import statistics
+from typing import Literal
 
 from pydantic import BaseModel, computed_field, field_validator
 
@@ -103,3 +104,14 @@ class SamplesEvaluated(BaseModel):
     @property
     def prompt_md5(self) -> str:
         return hashlib.md5(self.prompt_template.encode("utf-8")).hexdigest()  # noqa: S324
+
+
+class NERTaskConfidence(BaseModel):
+    risk: Literal["low", "medium", "high"]
+
+
+class SampleErrorRisk(BaseModel):
+    sentence: str
+    team_names: list[str]
+    player_names: list[str]
+    risk: Literal["low", "medium", "high"]

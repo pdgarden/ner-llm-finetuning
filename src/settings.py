@@ -39,3 +39,10 @@ class AnnotationErrorIdentificationSettings(BaseSettings):
     llm_client_api_key: str = "any"
     temperature: float = 0.0
     max_tokens: int = 250
+
+
+class NERAppSettings(BaseSettings):
+    # llm_model_id: str = "hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL"
+    llm_model_id: str = "llama3_1b_it_ner_instruct_dataset_1600:Q4_K_M"
+    llm_client_url: str = "http://localhost:11434/v1"  # default to ollama
+    llm_client_api_key: str = "any"

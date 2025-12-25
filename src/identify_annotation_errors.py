@@ -7,7 +7,7 @@ import openai
 from loguru import logger
 
 from src.constants import SYNTHETIC_DATA_DIR
-from src.prompt_identify_error import PROMPT_TEMPLATE
+from src.prompt_identify_annotation_errors import PROMPT_TEMPLATE
 from src.settings import AnnotationErrorIdentificationSettings
 from src.type import NERTaskConfidence, SampleErrorRisk, SyntheticSamplesAnnotated
 

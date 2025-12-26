@@ -15,7 +15,8 @@ Can be configured through environment variables, see [src/settings.py](src/setti
 3. `uv run python -m src.annotate_sentences`
 4. `uv run python -m src.evaluate_sentences`
 5. `uv run python -m src.identify_errors` (to help manually cleaning the dataset)
-6. `uv run python -m streamlit run src/app_ner.py`
+6. `uv run python -m src.split_and_preprocess_dataset`
+7. `uv run python -m streamlit run src/app_ner.py`
 
 
 
@@ -25,3 +26,4 @@ Run app:
 # Improvements
 
 - Add variability in synthetic dataset (upper / lower case)
+- Add samples with more entities

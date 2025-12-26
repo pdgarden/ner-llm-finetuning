@@ -27,9 +27,10 @@ Teams mentioned in possessive or plural forms.
 
 Did you incorrectly label any non-player/non-team entities as players or teams? Consider:
 
-Question words (e.g., "Qui", "Quel joueur").
-Locations, universities, or other non-entities (e.g., "Michigan", "New York hot dog vendor").
-Ambiguous terms that could be misinterpreted (e.g., "New York" as a city vs. a team).
+- Question words (e.g., you retrieved "Qui", "Quel joueur").
+- Locations, universities, or other non-entities (e.g., "Michigan", "New York hot dog vendor").
+- Ambiguous terms that could be misinterpreted (e.g., "New York" as a city vs. a team).
+- Inexact retrieval (e.g. the value in the original sentence is "Bulls de Chicago" but you extracted "Chicago Bulls")
 
 ## Contextual Check
 

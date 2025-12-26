@@ -8,7 +8,7 @@ from datetime import datetime
 import openai
 from loguru import logger
 
-from src.constants import SEED, SYNTHETIC_DATA_DIR, SYNTHETIC_DATA_FILE, TRAIN_TEST_SPLIT_RATIO
+from src.constants import SEED, SYNTHETIC_DATA_DIR, SYNTHETIC_DATA_FILE
 from src.prompts_synthetic_data_annotation import ASSISTANT_PROMPT_NER_RETRIEVAL
 from src.settings import SentenceAnnotationGenerationSettings
 from src.type import SyntheticSampleAnnotated, SyntheticSampleAnnotation, SyntheticSamples, SyntheticSamplesAnnotated
@@ -81,22 +81,9 @@ def main(settings: SentenceAnnotationGenerationSettings) -> None:
 
     annotated_synthetic_samples = SyntheticSamplesAnnotated(samples=annotated_samples)
 
-    # Split into train and test
-    categories = list(set(sample.category for sample in annotated_samples))
-    random.shuffle(categories)
-    train_categories = categories[: int(TRAIN_TEST_SPLIT_RATIO * len(categories))]
-    test_categories = categories[int(TRAIN_TEST_SPLIT_RATIO * len(categories)) :]
-    train_samples = [sample for sample in annotated_samples if sample.category in train_categories]
-    test_samples = [sample for sample in annotated_samples if sample.category in test_categories]
-
     # Save annotated samples
     with OUTPUT_SAMPLES_FILE.open("w", encoding="utf-8") as f:
         json.dump(annotated_synthetic_samples.model_dump(), f, indent=4, ensure_ascii=False)
-
-    with OUTPUT_SAMPLES_TRAIN_FILE.open("w", encoding="utf-8") as f:
-        json.dump(SyntheticSamplesAnnotated(samples=train_samples).model_dump(), f, indent=4, ensure_ascii=False)
-    with OUTPUT_SAMPLES_TEST_FILE.open("w", encoding="utf-8") as f:
-        json.dump(SyntheticSamplesAnnotated(samples=test_samples).model_dump(), f, indent=4, ensure_ascii=False)
 
     logger.info(f"Annotated samples saved to {OUTPUT_SAMPLES_FILE}")
 

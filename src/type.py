@@ -115,3 +115,8 @@ class SampleErrorRisk(BaseModel):
     team_names: list[str]
     player_names: list[str]
     risk: Literal["low", "medium", "high"]
+
+
+class SplitSyntheticSamplesAnnotated(BaseModel):
+    train: list[SyntheticSampleAnnotated]
+    test: list[SyntheticSampleAnnotated]

@@ -7,17 +7,17 @@ from time import perf_counter
 import openai
 from loguru import logger
 
-from src.constants import EVALUATED_DATA_DIR, TEST_ANNOTATED_SYNTHETIC_DATA_FILE
+from src.constants import ANNOTATED_SYNTHETIC_PROCESSED_DATA_FILE, EVALUATED_DATA_DIR
 from src.prompts_synthetic_data_annotation import ASSISTANT_PROMPT_NER_RETRIEVAL
 from src.settings import SentenceEvaluationSettings
-from src.type import SampleEvaluated, SamplesEvaluated, SyntheticSampleAnnotation, SyntheticSamplesAnnotated
+from src.type import SampleEvaluated, SamplesEvaluated, SplitSyntheticSamplesAnnotated, SyntheticSampleAnnotation
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Initialize
 
 
-with TEST_ANNOTATED_SYNTHETIC_DATA_FILE.open("r", encoding="utf-8") as f:
-    test_samples = SyntheticSamplesAnnotated.model_validate(json.load(f))
+with ANNOTATED_SYNTHETIC_PROCESSED_DATA_FILE.open("r", encoding="utf-8") as f:
+    test_samples = SplitSyntheticSamplesAnnotated.model_validate(json.load(f)).test
     # test_samples.samples = test_samples.samples[:30]  # Temporary limit for faster testing
 
 now = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -39,7 +39,7 @@ llm_client = openai.OpenAI(
 def main(settings: SentenceEvaluationSettings) -> None:
     evaluated_samples: list[SampleEvaluated] = []
 
-    for i, sample in enumerate(test_samples.samples):
+    for i, sample in enumerate(test_samples):
         if i % 50 == 0:
             logger.info(f"Evaluating sample n°{i}")
 

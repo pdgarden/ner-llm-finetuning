@@ -46,3 +46,9 @@ class NERAppSettings(BaseSettings):
     llm_model_id: str = "llama3_1b_it_ner_instruct_dataset_1600:Q4_K_M"
     llm_client_url: str = "http://localhost:11434/v1"  # default to ollama
     llm_client_api_key: str = "any"
+
+
+class SplitAndPreprocessDatasetSettings(BaseSettings):
+    train_test_split_ratio: float = 0.8
+    team_lowercase_rate: float = 0.10
+    player_lowercase_rate: float = 0.10

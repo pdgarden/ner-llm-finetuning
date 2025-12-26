@@ -36,7 +36,7 @@ def main(settings: AnnotationErrorIdentificationSettings) -> None:
     annotated_samples_risk: list[SampleErrorRisk] = []
     # annotated_dataset.samples = annotated_dataset.samples[:100]
     for i, sample in enumerate(annotated_dataset.samples):
-        if i % 50 == 0:
+        if i % 10 == 0:
             logger.info(f"Sample n°: {i}")
 
         prompt = PROMPT_TEMPLATE.format(
@@ -66,6 +66,15 @@ def main(settings: AnnotationErrorIdentificationSettings) -> None:
         )
 
         annotated_samples_risk.append(annotated_sample_risk)
+
+        if i % 10 == 0:
+            with output_dataset_filepath.open("w", encoding="utf-8") as f:
+                json.dump(
+                    [sample.model_dump() for sample in annotated_samples_risk],
+                    f,
+                    indent=4,
+                    ensure_ascii=False,
+                )
 
     with output_dataset_filepath.open("w", encoding="utf-8") as f:
         json.dump(

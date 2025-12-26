@@ -24,8 +24,8 @@ class SentenceAnnotationGenerationSettings(BaseSettings):
 
 
 class SentenceEvaluationSettings(BaseSettings):
-    llm_model_id: str = "llama3.2:1b"
-    # llm_model_id: str = "unsloth_model"
+    # llm_model_id: str = "llama3.2:1b"
+    llm_model_id: str = "llama3-1_ner_finetune:Q4_K_M"
     llm_client_url: str = "http://localhost:11434/v1"  # default to ollama
     llm_client_api_key: str = "any"
     temperature: float = 0.0
@@ -33,8 +33,8 @@ class SentenceEvaluationSettings(BaseSettings):
 
 
 class AnnotationErrorIdentificationSettings(BaseSettings):
-    llm_model_id: str = "hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL"
-    # llm_model_id: str = "unsloth_model"
+    # llm_model_id: str = "hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL"
+    llm_model_id: str = "mistral-small3.2:24b-instruct-2506-q4_K_M"
     llm_client_url: str = "http://localhost:11434/v1"  # default to ollama
     llm_client_api_key: str = "any"
     temperature: float = 0.0

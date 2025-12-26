@@ -6,7 +6,7 @@ class SyntheticSentenceGenerationSettings(BaseSettings):
         "mistral-small3.2:24b-instruct-2506-q4_K_M",
         "hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL",
     ]
-    llm_client_url: str = "http://localhost:11434/v1"  # default to ollama
+    llm_client_url: str = "http://localhost:11434/v1"  # ollama
     llm_client_api_key: str = "any"
     temperature: float = 1.0
     top_p: float = 0.9
@@ -16,35 +16,31 @@ class SyntheticSentenceGenerationSettings(BaseSettings):
 
 
 class SentenceAnnotationGenerationSettings(BaseSettings):
-    # llm_model_id: str = "mistral-small3.2:24b-instruct-2506-q4_K_M"
     llm_model_id: str = "gemma3:12b-it-q4_K_M"
-    llm_client_url: str = "http://localhost:11434/v1"  # default to ollama
+    llm_client_url: str = "http://localhost:11434/v1"  # ollama
     llm_client_api_key: str = "any"
     temperature: float = 0.0
 
 
 class SentenceEvaluationSettings(BaseSettings):
-    # llm_model_id: str = "llama3.2:1b"
-    llm_model_id: str = "llama3-1_ner_finetune:Q4_K_M"
-    llm_client_url: str = "http://localhost:11434/v1"  # default to ollama
+    llm_model_id: str = "Llama-3.2-1B-nba-ner-GGUF:Q4_K_M"
+    llm_client_url: str = "http://localhost:11434/v1"  # ollama
     llm_client_api_key: str = "any"
     temperature: float = 0.0
     max_tokens: int = 250
 
 
 class AnnotationErrorIdentificationSettings(BaseSettings):
-    # llm_model_id: str = "hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL"
     llm_model_id: str = "mistral-small3.2:24b-instruct-2506-q4_K_M"
-    llm_client_url: str = "http://localhost:11434/v1"  # default to ollama
+    llm_client_url: str = "http://localhost:11434/v1"  # ollama
     llm_client_api_key: str = "any"
     temperature: float = 0.0
     max_tokens: int = 250
 
 
 class NERAppSettings(BaseSettings):
-    # llm_model_id: str = "hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:UD-Q4_K_XL"
     llm_model_id: str = "llama3_1b_it_ner_instruct_dataset_1600:Q4_K_M"
-    llm_client_url: str = "http://localhost:11434/v1"  # default to ollama
+    llm_client_url: str = "http://localhost:11434/v1"  # ollama
     llm_client_api_key: str = "any"
 
 
@@ -52,3 +48,7 @@ class SplitAndPreprocessDatasetSettings(BaseSettings):
     train_test_split_ratio: float = 0.8
     team_lowercase_rate: float = 0.10
     player_lowercase_rate: float = 0.10
+
+
+class TrainSettings(BaseSettings):
+    huggingface_token: str = ""

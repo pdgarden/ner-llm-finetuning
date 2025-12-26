@@ -4,6 +4,7 @@ from unsloth import FastLanguageModel  # noqa: I001
 from unsloth.chat_templates import get_chat_template, train_on_responses_only
 
 import os
+import shutil
 from datetime import datetime
 
 from datasets import Dataset
@@ -14,6 +15,7 @@ from loguru import logger
 from src.constants import ANNOTATED_SYNTHETIC_PROCESSED_DATA_FILE, MODELS_DIR
 from src.prompt_train import TRAIN_ASSISTANT_PROMPT_NER_RETRIEVAL
 from src.type import SplitSyntheticSamplesAnnotated, SyntheticSampleAnnotated
+from src.settings import TrainSettings
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Functions
@@ -27,7 +29,7 @@ def convert_sample_to_chatml(sample: SyntheticSampleAnnotated) -> list[dict[str,
     ]
 
 
-def main() -> None:
+def main(settings: TrainSettings) -> None:
     logger.info("Setup model")
 
     instruct_model = "unsloth/Llama-3.2-1B-Instruct-bnb-4bit"
@@ -107,19 +109,25 @@ def main() -> None:
     logger.info("Save")
     now = datetime.now().strftime("%Y%m%d_%H%M%S")
     current_model_dir = MODELS_DIR / now
-    fine_tune_model_name = "llama3-1_ner_finetune_q4_k_m"
+    fine_tune_model_name = "Llama-3.2-1B-nba-ner-GGUF:Q4_K_M"
     model.save_pretrained_gguf(current_model_dir / fine_tune_model_name, tokenizer, quantization_method="q4_k_m")
 
-    os.system(  # noqa: S605
-        "ollama create llama3-1_ner_finetune:q4_k_m -f"  # noqa: S607
-        "/home/pdesj/work/github/ner-llm-finetuning/src/Modelfile"
+    shutil.move("src/Modelfile", "./")
+    os.system("ollama create Llama-3.2-1B-nba-ner-GGUF:Q4_K_M -f Modelfile")  # noqa: S605, S607
+
+    model.push_to_hub_gguf(
+        f"pdesj/{fine_tune_model_name.replace(':', '-')}",
+        tokenizer,
+        quantization_method="q4_k_m",
+        token=settings.huggingface_token,
     )
 
     logger.info("Done")
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Main
 
 
 if __name__ == "__main__":
-    main()
+    main(settings=TrainSettings())

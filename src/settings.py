@@ -39,9 +39,12 @@ class AnnotationErrorIdentificationSettings(BaseSettings):
 
 
 class NERAppSettings(BaseSettings):
-    llm_model_id: str = "llama3_1b_it_ner_instruct_dataset_1600:Q4_K_M"
-    llm_client_url: str = "http://localhost:11434/v1"  # ollama
-    llm_client_api_key: str = "any"
+    base_llm_model_id: str = "llama3.2:1b"
+    base_llm_client_url: str = "http://localhost:11434/v1"  # ollama
+    base_llm_client_api_key: str = "any"
+    concurrent_llm_model_id: str = "Llama-3.2-1B-nba-ner-GGUF:Q4_K_M"
+    concurrent_llm_client_url: str = "http://localhost:11434/v1"  # ollama
+    concurrent_llm_client_api_key: str = "any"
 
 
 class SplitAndPreprocessDatasetSettings(BaseSettings):

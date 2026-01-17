@@ -8,18 +8,22 @@ from src.type import SyntheticSampleAnnotation
 
 settings = NERAppSettings()
 
-llm_client = openai.OpenAI(
-    base_url=settings.llm_client_url,
-    api_key=settings.llm_client_api_key,
+base_llm_client = openai.OpenAI(
+    base_url=settings.base_llm_client_url,
+    api_key=settings.base_llm_client_api_key,
+)
+concurrent_llm_client = openai.OpenAI(
+    base_url=settings.concurrent_llm_client_url,
+    api_key=settings.concurrent_llm_client_api_key,
 )
 
 
-def extract_entities(text: str) -> SyntheticSampleAnnotation:
+def extract_entities(text: str, client: openai.OpenAI, llm_model_id: str) -> SyntheticSampleAnnotation:
     assistant_prompt = ASSISTANT_PROMPT_NER_RETRIEVAL.format(
         expected_json_schema=SyntheticSampleAnnotation.model_json_schema()
     )
-    completion = llm_client.beta.chat.completions.parse(
-        model=settings.llm_model_id,
+    completion = client.beta.chat.completions.parse(
+        model=llm_model_id,
         messages=[
             {"role": "assistant", "content": assistant_prompt},
             {"role": "user", "content": text},
@@ -88,18 +92,43 @@ def format_extracted_entities(  # noqa: C901
     return result
 
 
+def get_annotated_text(
+    text: str,
+    client: openai.OpenAI,
+    llm_model_id: str,
+) -> tuple[list[str | tuple[str, str]], SyntheticSampleAnnotation]:
+    extracted_entities = extract_entities(text=text, client=client, llm_model_id=llm_model_id)
+    sentence_annotated = format_extracted_entities(
+        sentence=input_text,
+        team_names=extracted_entities.team_names,
+        player_names=extracted_entities.player_names,
+    )
+
+    return sentence_annotated, extracted_entities
+
+
 st.title("Named Entity Recognition - NBA teams and players")
 input_text = st.text_input("Sentence to process")
 perform_ner = st.button("Execute")
 
 
 if perform_ner:
-    extracted_entities = extract_entities(text=input_text)
-    sentence_annotated = format_extracted_entities(
-        sentence=input_text,
-        team_names=extracted_entities.team_names,
-        player_names=extracted_entities.player_names,
+    base_model_sentence_annotated, base_model_extracted_entities = get_annotated_text(
+        text=input_text, client=base_llm_client, llm_model_id=settings.base_llm_model_id
     )
-    annotated_text(sentence_annotated)
+    concurrent_model_sentence_annotated, concurrent_model_extracted_entities = get_annotated_text(
+        text=input_text, client=concurrent_llm_client, llm_model_id=settings.concurrent_llm_model_id
+    )
+
     st.divider()
-    st.code(extracted_entities.model_dump_json(indent=3))
+    col_1, col_2 = st.columns(2)
+    with col_1:
+        st.caption(f"_Model: {settings.base_llm_model_id}_")
+        annotated_text(base_model_sentence_annotated)
+        st.divider()
+        st.code(base_model_extracted_entities.model_dump_json(indent=3))
+    with col_2:
+        st.caption(f"_Model: {settings.concurrent_llm_model_id}_")
+        annotated_text(concurrent_model_sentence_annotated)
+        st.divider()
+        st.code(concurrent_model_extracted_entities.model_dump_json(indent=3))

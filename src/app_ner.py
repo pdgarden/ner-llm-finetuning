@@ -80,7 +80,13 @@ def format_extracted_entities(  # noqa: C901
             substring = sentence[current_pos:start]
             if substring.strip():  # if substring is not just whitespace
                 result.append(substring)
-        result.append((element, identifier))
+        result.append(
+            (
+                element,
+                identifier,
+                {"team": "#ABE0F0", "player": "#FFA240"}.get(identifier),  # Color
+            )
+        )
         current_pos = end
 
     # Add the remaining part of the sentence if it's not just whitespace
